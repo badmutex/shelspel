@@ -23,3 +23,4 @@ library
   hs-source-dirs:      src
 
   exposed-modules:     Language.Shelspel.AST
+                     , Language.Shelspel.Analysis.Semantic
