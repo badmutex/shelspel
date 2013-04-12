@@ -108,9 +108,7 @@ instance CGen CompoundStatement where
             cgen m
             stream ")"
             nl
-            forM_ as $ \a -> do
-              cgen a
-              nl
+            nl `cgweave` as
             nl
             semic >> semic
 
