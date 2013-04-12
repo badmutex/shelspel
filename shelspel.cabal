@@ -25,3 +25,4 @@ library
   exposed-modules:     Language.Shelspel.AST
                      , Language.Shelspel.Analysis.Semantic
                      , Language.Shelspel.Codegen.Types
+                     , Language.Shelspel.Codegen.Bash
