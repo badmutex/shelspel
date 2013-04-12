@@ -26,9 +26,19 @@ empty = []
 type instance S = Bash
 type instance R = ()
 
+
+-- --------------------------------------------------------------------------------
+
+-- | Weave two actions through the code generator. The first is called
+-- on each element, then the second action is executed.
 weave :: (a -> State S R) -> State S R -> [a] -> State S R
 weave f a = mapM_ (\x -> f x >> a)
 
+-- | Weave a call to 'cgen' over each list.
+-- 
+-- This can be used, eg, to to intercalate semicolons or newlines:
+-- > nl `cgweave` program
+-- > semic `cgweave` program
 cgweave :: CGen x => State S R -> [x] -> State S R
 cgweave = weave cgen
 
@@ -43,12 +53,18 @@ stream s = modify (s:)
 nl :: State S R
 nl = stream "\n"
 
+-- | Call the element as a subprocess. E.g.
+-- 
+-- > $(echo "hello world")
 subproc :: CGen x => x -> State S R
 subproc x = do
   stream "$("
   cgen x
   stream ")"
 
+-- | Evaluate the expression as a mathematical expression
+-- 
+-- > $(( 40 + 2 ))
 math :: Expr -> State S R
 math e = do
   stream "$(("
@@ -57,8 +73,11 @@ math e = do
   stream " "
   stream "))"
 
+-- | Insert a semicolon (;)
 semic :: State S R
 semic = stream ";"
+
+-- -------------------------------------------------------------------------------- --
 
 instance CGen Expr where
     cgen (Literal s) = stream $ "\"" ++ s ++ "\""
