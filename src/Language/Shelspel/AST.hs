@@ -21,19 +21,20 @@ data Cmd = Execute Action
 -- | Actions can produce side-effects
 data Action = Call  Id [Expr] -- ^ call a program or function
             | Cmpd  CompoundStatement -- ^ switching or looping
-            | Pipe  Capture Action -- ^ compose actions
-            | Sink  Action FilePath -- ^ save the output
-            | Store Id Action Stream -- ^ store the result in a variable
+            | Pipe  Captured Action -- ^ compose actions
+            | Sink  Action Stream FilePath Mode -- ^ save the output
+            | Store Id Captured -- ^ store the result in a variable
             | Eval  Expr
             | Result Result -- ^ like break, return, except, rolled into one: exit the current context immediately
               deriving (Eq, Show)
 
-
+data Mode = Write | Append
+          deriving (Eq, Show)
 
 data Stream = Stdout | Stderr | All
             deriving (Eq, Show)
 
-data Capture = Capture Stream Action
+data Captured = Captured Stream Action
              deriving (Eq, Show)
 
 data CompoundStatement = Match Expr [(Expr, [Cmd])]
@@ -46,6 +47,7 @@ data Op = Add | Sub | Mul | Div
         deriving (Eq, Show)
 
 data Expr = Literal String
+          | Var Id
           | BinOp Op Expr Expr
           deriving (Eq, Show)
 
