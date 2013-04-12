@@ -8,15 +8,10 @@ import Language.Shelspel.Codegen.Types
 import Control.Monad
 
 
-codegen :: State S R -> Bash
-codegen = flip execState empty
-
-
--- -- | A script has a global namespace as well as the current scope
--- data Bash = Bash {
---       stGlobal :: [String]
---     , stStream :: [String]
---     } deriving (Eq, Show)
+codegen :: Program -> String
+codegen prog = script
+    where bash = flip execState empty $ cgen prog
+          script = foldl (++) "" $ reverse bash
 
 type Bash = [String]
 
@@ -42,14 +37,11 @@ weave f a = mapM_ (\x -> f x >> a)
 cgweave :: CGen x => State S R -> [x] -> State S R
 cgweave = weave cgen
 
+-- | Insert an element into the stream
+stream :: String -> State S R
 stream s = modify (s:)
 
--- global :: String -> State S R
--- global s = modify (\b -> b { stGlobal = s : stGlobal b })
-
--- stream :: String -> State S R
--- stream s = modify (\b -> b { stStream = s : stStream b })
-
+-- | Insert a newline (\n) into the stream
 nl :: State S R
 nl = stream "\n"
 
