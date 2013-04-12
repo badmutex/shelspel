@@ -61,14 +61,18 @@ mdrun = Call "mdrun" $ map Literal $ words $ "-ff amber03 -water none -ignh"
 
 loop = While (Result 0) [Execute mdrun]
 
-dfunc = Funcdef "func" [] [Execute $ Call "echo" [Literal "hello"],
-                           Execute $ Call "echo" [Literal "world"]]
+dfunc = Funcdef "func" ["rest"] [Execute $ Call "echo" [Literal "hello"],
+                                 Execute $ Call "echo" [Literal "world"],
+                                 Execute $ Call "echo" [Var "rest"]
+                                ]
 
 d42 = Define "const" $ Literal "42"
 
 prog = Program [ Execute ls
-               , Execute mdrun
-               , Execute $ Cmpd loop
+--               , Execute mdrun
+--               , Execute $ Cmpd loop
                , dfunc
                , d42
+               , Execute $ Call "echo" [Var "const"]
+               , Execute $ Call "func" [Literal "Fezzes are cool"]
                ]
